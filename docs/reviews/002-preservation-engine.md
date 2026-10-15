@@ -2,7 +2,7 @@
 
 Independent reviewer: discover_field_science agent, 2026-10-15. The reviewer designed initial golden/mutation tests from specifications and public fixtures without reading the implementation, then performed an adversarial code review and added reproduced regression cases. Agent review is not practitioner/customer validation.
 
-Final local result:75/75 tests pass across two suites;62 independently authored acceptance cases. Tests cover literal source SHA-256, public fixture hashes, retained language/value multiplicity, page and painting order, rights/links/metadata, identity and scoped URI mappings, stale decisions, unsupported versions/structures, malformed JSON, resource limits and numerical evidence integrity.
+Final local result:76/76 tests pass across two suites;62 independently authored acceptance cases. A later integration check added BOM-preserving hash parity and explicit report/coverage budgets. Tests cover literal source SHA-256, public fixture hashes, retained language/value multiplicity, page and painting order, rights/links/metadata, identity and scoped URI mappings, stale decisions, unsupported versions/structures, malformed JSON, resource limits and numerical evidence integrity.
 
 Resolved blocking findings:
 

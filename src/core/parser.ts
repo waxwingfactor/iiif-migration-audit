@@ -69,6 +69,7 @@ export function parseJson(text: string): JsonObject {
       'Input exceeds the 20 MiB limit. Split the corpus into manifests.',
     );
   }
+  if (text.charCodeAt(0) === 0xfeff) text = text.slice(1);
   checkLexicalDepth(text);
   const errors: ParseError[] = [];
   const tree = parseTree(text, errors, { allowTrailingComma: false, disallowComments: true });

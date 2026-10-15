@@ -174,6 +174,7 @@ export async function audit(
   ]);
   const coverage: CoverageNotice[] = [...baseline.coverage, ...candidate.coverage];
   const pending: PendingFinding[] = [];
+  let evidenceBytes = 0;
   const emit = (
     code: string,
     severity: Severity,
@@ -185,6 +186,14 @@ export async function audit(
     bp: string | null,
     cp: string | null,
   ): void => {
+    evidenceBytes +=
+      new TextEncoder().encode(stableStringify(before)).byteLength +
+      new TextEncoder().encode(stableStringify(after)).byteLength;
+    if (pending.length >= 25_000 || evidenceBytes > 64 * 1024 * 1024)
+      throw new AuditError(
+        'REPORT_BUDGET',
+        'Generated evidence exceeds the 25,000-finding or 64 MiB report budget. Split the audit into smaller documents.',
+      );
     pending.push({
       code,
       severity,

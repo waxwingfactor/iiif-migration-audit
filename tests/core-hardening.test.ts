@@ -107,3 +107,11 @@ it('blocks image mappings that collapse distinct source images into one identity
   expect(report.status).toBe('incomplete');
   expect(report.coverage.some((notice) => notice.code === 'URI_IDENTITY_COLLISION')).toBe(true);
 });
+
+it('accepts a UTF-8 BOM without changing the original snapshot hash', async () => {
+  const text = '\ufeff' + JSON.stringify(book());
+  const report = await audit({ name: 'bom.json', text }, { name: 'bom.json', text });
+  expect(report.status).toBe('pass');
+  const plain = await run(book(), book());
+  expect(report.baseline.sha256).not.toBe(plain.baseline.sha256);
+});

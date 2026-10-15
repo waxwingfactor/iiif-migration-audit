@@ -107,6 +107,12 @@ export function extract(document: JsonObject, side: 'baseline' | 'candidate'): S
   const notice = (pointer: string, code: string, message: string): void => {
     const key = `${pointer}:${code}`;
     if (!seenCoverage.has(key)) {
+      if (snapshot.coverage.length >= 10_000)
+        throw new AuditError(
+          'COVERAGE_BUDGET',
+          'This manifest exceeds the 10,000-notice coverage budget. Reduce the input or review its unsupported profile separately.',
+          pointer,
+        );
       snapshot.coverage.push({ side, pointer, code, message });
       seenCoverage.add(key);
     }
