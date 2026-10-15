@@ -20,6 +20,7 @@ try {
     execFileSync(npm, ['pack', '--ignore-scripts', '--json', '--pack-destination', scratch], {
       cwd: root,
       encoding: 'utf8',
+      env: isolatedNpmEnv,
     }),
   )[0];
   assert.ok(
