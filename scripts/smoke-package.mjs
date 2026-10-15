@@ -8,6 +8,7 @@ const root = process.cwd();
 const npm = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const scratch = mkdtempSync(join(tmpdir(), 'iiif-package-smoke-'));
 const metadata = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
+const isolatedNpmEnv = { ...process.env, npm_config_cache: join(scratch, 'npm-cache') };
 
 try {
   assert.equal(
@@ -55,7 +56,7 @@ try {
       '--no-fund',
       join(scratch, packed.filename),
     ],
-    { encoding: 'utf8' },
+    { encoding: 'utf8', env: isolatedNpmEnv },
   );
   const bin = join(install, 'node_modules', metadata.name, 'dist', 'cli', 'index.js');
   const invoke = (args, expected = 0) => {
