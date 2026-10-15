@@ -1,0 +1,5 @@
+# Official IIIF source snapshots
+
+IIIF Presentation API examples and cookbook recipes, IIIF Consortium, editors and contributors. Exact URLs, request headers, retrieval dates and raw-byte SHA-256 digests are in SOURCES.json. Source terms are separately documented there; these samples are not relicensed under the project MIT license. Embedded rights and attribution remain unchanged. Referenced collection objects/images retain their own rights; no image pixels are included. No endorsement is implied.
+
+The official specification identifies CC BY 4.0 publication: https://iiif.io/api/presentation/3.0/ ; contribution terms: https://github.com/IIIF/api#contributions ; license: https://creativecommons.org/licenses/by/4.0/ . The snapshot JSON is unmodified. Tests deliberately edited from it describe their modifications in code. Numbered v2 and cookbook v3 fixtures generally illustrate related features, not equivalent objects. Only 0057-v2 / 0057-v3 are an official paired representation of the same resource; it still changes the language assertion of the title from untagged to English.

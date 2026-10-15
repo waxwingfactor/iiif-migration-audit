@@ -1,0 +1,272 @@
+[
+  {
+    "file": "0057-v2.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0057-publishing-v2-and-v3/manifest.json",
+    "accept": "application/ld+json;profile=\"http://iiif.io/api/presentation/2/context.json\"",
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0057-publishing-v2-and-v3/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1355,
+    "sha256": "91d667485d84ed5e5eb933b6ebd7b4eb5d1fcc4693acd7f2cc59e1397399fc7b",
+    "contentType": "application/ld+json;profile=http://iiif.io/api/presentation/2/context.json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "0057-v3.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0057-publishing-v2-and-v3/manifest.json",
+    "accept": "application/ld+json;profile=\"http://iiif.io/api/presentation/3/context.json\"",
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0057-publishing-v2-and-v3/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/3/context.json",
+    "bytes": 1313,
+    "sha256": "57ee56bc6b8628e0b26c9c61c0a4a28d22832cd5683d0f75175435ca03fcb40b",
+    "contentType": "application/ld+json;profile=http://iiif.io/api/presentation/3/context.json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-01.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/1/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/1/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1143,
+    "sha256": "cd09368ebb781bf3203de28c0e318b5797e775a528abb65a13fa0e5e56b2eeed",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-03.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/3/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/3/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1438,
+    "sha256": "65136890f9256d75cbd6bf4cdd6117b5cea53713b43abedc8a2d63470f82f92f",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-04.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/4/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/4/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1340,
+    "sha256": "a307a816f3e78eae016bea5b721224af8cf64988d7f1d48a70e34fd01b523a09",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-07.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/7/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/7/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1276,
+    "sha256": "e72d361977b64c9caeef8028e2bcb1bc272c2ab799b46ce9a312c68619139b24",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-19.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/19/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/19/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1918,
+    "sha256": "40f7d3815a5d557df305142be88b6a5c0a4bb42c58fe1c9e437b88b36f0e451f",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-21.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/21/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/21/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1294,
+    "sha256": "9ec4f1adaf6067805edb7a32b98eedc7aea8f4391df0f9f723a9d83acdfdf7fa",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-26.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/26/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/26/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1191,
+    "sha256": "7b5b34125cce71b4b9df9abc8522cc1f409d2636178db0250d0fd6d426e479b2",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-29.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/29/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/29/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 2021,
+    "sha256": "3badf3b501f20a24c092684f943a5f9a144d616621ee8bfff049d4c272a076d8",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "v2-30.json",
+    "url": "https://iiif.io/api/presentation/2.1/example/fixtures/30/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/presentation/2.1/example/fixtures/30/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/2/context.json",
+    "bytes": 1704,
+    "sha256": "ec275da733827f220fc2631cf0f5187237ae3184868b8b23fb35fca83e4e0a25",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "0006-text-language.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0006-text-language/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0006-text-language/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/3/context.json",
+    "bytes": 2611,
+    "sha256": "4cc6dcc92e9438378e478db9c3b9450bb08ac9fe2a25bbd58a387fc92ac235f2",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "0009-book-1.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0009-book-1/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0009-book-1/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/3/context.json",
+    "bytes": 7084,
+    "sha256": "8baa05dbc4c67bdcf8b08cf8b4dfb8217114f025d25854e7e6a7ac16150442ce",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "0024-book-4-toc.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0024-book-4-toc/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0024-book-4-toc/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/3/context.json",
+    "bytes": 10763,
+    "sha256": "737c5af388edaf048aa916db15a50a7bc139daf156e73996cd936008dba17f2e",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  },
+  {
+    "file": "0036-composition-from-multiple-images.json",
+    "url": "https://iiif.io/api/cookbook/recipe/0036-composition-from-multiple-images/manifest.json",
+    "accept": null,
+    "finalUrl": "https://iiif.io/api/cookbook/recipe/0036-composition-from-multiple-images/manifest.json",
+    "retrieved": "2026-10-15",
+    "context": "http://iiif.io/api/presentation/3/context.json",
+    "bytes": 2974,
+    "sha256": "0d8895e6b7ad1a8db6eab820a01415d075ad56c642afb9b3b969f635d0b5f1bf",
+    "contentType": "application/json",
+    "modified": false,
+    "attribution": "IIIF Consortium, editors and contributors; original rights/attribution values retained",
+    "sourceLicenseEvidence": [
+      "https://iiif.io/api/presentation/3.0/",
+      "https://github.com/IIIF/api#contributions"
+    ],
+    "sourceTerms": "CC-BY source publication; embedded rights/attribution retained; referenced image assets not vendored"
+  }
+]
