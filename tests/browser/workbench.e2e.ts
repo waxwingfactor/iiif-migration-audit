@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { createHash } from 'node:crypto';
 import AxeBuilder from '@axe-core/playwright';
 import { demo } from '../../src/web/demo';
 
@@ -35,7 +36,7 @@ test('example supports review, source provenance, a reversible decision and offl
   await page.getByRole('tab', { name: /Page sequence/ }).click();
   await expect(page.locator('.pair-table tbody tr')).toHaveCount(4);
   await expect(page.locator('.sequence-moved')).toHaveCount(2);
-  await page.getByRole('tab', { name: /Coverage & scope/ }).click();
+  await page.getByRole('tab', { name: /Coverage/ }).click();
   await expect(page.getByText('The declared comparison profile was assessed')).toBeVisible();
   await page.getByText('Export report', { exact: true }).click();
   const downloadPromise = page.waitForEvent('download');
@@ -88,7 +89,7 @@ test('unknown extensions stay incomplete and cannot be accepted into a pass', as
   });
   await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
   await expect(page.locator('#result-title')).toHaveText('Assessment is incomplete');
-  await page.getByRole('tab', { name: /Coverage & scope/ }).click();
+  await page.getByRole('tab', { name: /Coverage/ }).click();
   await expect(page.locator('.coverage-list')).toContainText('custom:uninspected');
   await expect(page.getByRole('button', { name: 'Accept with reason' })).toHaveCount(0);
 });
@@ -116,7 +117,16 @@ test('hostile metadata remains inert in app and source inspector', async ({ page
   await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
   await expect(page.locator('#result-title')).toBeVisible();
   await page.getByRole('searchbox', { name: 'Search findings' }).fill('malicious.example');
-  await expect(page.locator('.finding-detail')).toContainText(payload);
+  const displayed = JSON.parse(await page.locator('.evidence-baseline pre').innerText()) as {
+    none: string[];
+  };
+  expect(displayed.none[0]).toBe(payload);
+  await page
+    .getByRole('button', { name: /Inspect source/ })
+    .first()
+    .click();
+  expect(JSON.parse(await page.getByRole('dialog').locator('pre').innerText())).toBe(payload);
+  await expect(page.locator('img[src*="malicious.example"]')).toHaveCount(0);
   expect(await page.evaluate(() => 'compromised' in window)).toBe(false);
   expect(requests).toEqual([]);
 });
@@ -139,4 +149,79 @@ test('core journeys have no serious accessibility violations and remain usable a
     true,
   );
   await expect(page.locator('.pair-table')).toBeVisible();
+});
+
+test('review policy round-trips and stale decisions can be removed without editing JSON', async ({
+  page,
+}) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Explore an example' }).click();
+  await expect(page.locator('#result-title')).toBeVisible();
+  await page
+    .getByLabel('Is this change intentional?')
+    .fill('The page order correction was verified by the collections reviewer.');
+  await page.getByRole('button', { name: 'Accept with reason' }).click();
+  await page.getByRole('button', { name: /Comparison policy/ }).click();
+  const downloadPromise = page.waitForEvent('download');
+  await page.getByRole('button', { name: 'Export policy', exact: true }).click();
+  const download = await downloadPromise;
+  const stream = await download.createReadStream();
+  if (!stream) throw new Error('The exported policy could not be read.');
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(Buffer.from(chunk));
+  const exported = Buffer.concat(chunks);
+  await page.reload();
+  await page.getByLabel('Choose baseline manifest').setInputFiles({
+    name: demo.baseline.name,
+    mimeType: 'application/json',
+    buffer: Buffer.from(demo.baseline.text),
+  });
+  await page.getByLabel('Choose candidate manifest').setInputFiles({
+    name: demo.candidate.name,
+    mimeType: 'application/json',
+    buffer: Buffer.from(demo.candidate.text),
+  });
+  await page.getByRole('button', { name: /Comparison policy/ }).click();
+  await page
+    .getByLabel('Import comparison policy')
+    .setInputFiles({ name: 'review-policy.json', mimeType: 'application/json', buffer: exported });
+  await expect(page.locator('.policy-footer')).toContainText('1 review decision');
+  await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
+  await expect(page.locator('.result-summary')).toContainText('1 accepted');
+  await page
+    .locator('[aria-label="Candidate input method"]')
+    .getByRole('button', { name: 'Paste' })
+    .click();
+  await page.getByLabel('Candidate manifest JSON').fill(`${demo.candidate.text}\n`);
+  await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
+  await expect(page.locator('#result-title')).toHaveText('Assessment is incomplete');
+  await page.locator('.saved-decisions summary').click();
+  await page.getByRole('button', { name: /Remove saved decision/ }).click();
+  await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
+  await expect(page.locator('#result-title')).toHaveText('Preservation changes need attention');
+  await expect(page.locator('.result-summary')).toContainText('0 accepted');
+});
+
+test('UTF-8 BOM files retain the same exact evidence hash as the CLI', async ({ page }) => {
+  const text = `\uFEFF${demo.baseline.text}`;
+  const hash = createHash('sha256').update(text, 'utf8').digest('hex');
+  await page.goto('/');
+  await page
+    .getByLabel('Choose baseline manifest')
+    .setInputFiles({
+      name: 'before-with-bom.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(text, 'utf8'),
+    });
+  await page
+    .getByLabel('Choose candidate manifest')
+    .setInputFiles({
+      name: demo.candidate.name,
+      mimeType: 'application/json',
+      buffer: Buffer.from(demo.candidate.text),
+    });
+  await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
+  await expect(page.locator('#result-title')).toBeVisible();
+  await page.getByRole('tab', { name: /Coverage/ }).click();
+  await expect(page.locator('.report-provenance')).toContainText(hash);
 });

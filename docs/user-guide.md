@@ -27,7 +27,7 @@ The **Findings** tab gives a searchable register and evidence view. Filter by ca
 
 The **Page sequence** tab shows unambiguous Canvas pairs. Numbers in the candidate strip refer to their original baseline positions, making reordered pages visible. Pairing uses exact identities or explicit Canvas rules. The table includes only established pairs; consult Findings for additions and removals. Labels and positions are never used to guess identity.
 
-The **Coverage & scope** tab lists unsupported or uninspected structures, input hashes and engine/profile versions. Review this tab even when no differences are found. External image URIs can be compared without proving image-byte equality or remote availability. Use complementary checks for specification conformance, pixels and color, remote OCR/annotations, CORS, authentication and viewer behavior.
+The **Coverage** tab lists unsupported or uninspected structures, input hashes and engine/profile versions. Review this tab even when no differences are found. External image URIs can be compared without proving image-byte equality or remote availability. Use complementary checks for specification conformance, pixels and color, remote OCR/annotations, CORS, authentication and viewer behavior.
 
 ## Map deliberate URL changes
 

@@ -85,7 +85,10 @@ export function App() {
   useEffect(() => setPairPage(0), [originalReport]);
   useEffect(() => setCoveragePage(0), [originalReport]);
   useEffect(() => {
-    if (originalReport) resultHeading.current?.focus();
+    if (originalReport) {
+      resultHeading.current?.focus({ preventScroll: true });
+      resultHeading.current?.closest('.results')?.scrollIntoView({ block: 'start' });
+    }
   }, [originalReport]);
 
   function cancel() {
@@ -268,18 +271,18 @@ export function App() {
       <main id="main">
         <section className="intro">
           <div>
-            <p className="intro-label">Preserve the meaning, not just the JSON.</p>
-            <h1>Review a collection release.</h1>
+            <p className="intro-label">Preserve your collection’s meaning.</p>
+            <h1>Review a manifest migration.</h1>
             <p className="intro-description">
-              Find changed pages, metadata, rights and identities between your current manifests and
-              their replacement.
+              Compare a current manifest with its replacement to find changed pages, metadata,
+              rights and identities.
             </p>
           </div>
           <div className="local-note">
             <Icon name="shield" size={21} />
             <div>
               <strong>Your files stay on this device.</strong>
-              <span>No uploads, accounts or automatic network requests.</span>
+              <span>No uploads, accounts or linked-resource downloads.</span>
             </div>
           </div>
         </section>
@@ -526,7 +529,7 @@ export function App() {
                 [
                   ['findings', 'Findings', report.findings.length],
                   ['pages', 'Page sequence', report.canvasPairs.length],
-                  ['coverage', 'Coverage & scope', report.coverage.length],
+                  ['coverage', 'Coverage', report.coverage.length],
                 ] as const
               ).map(([value, label, count]) => (
                 <button
@@ -601,9 +604,11 @@ export function App() {
                             onClick={() => {
                               setSelected(finding.id);
                               if (window.matchMedia('(max-width: 760px)').matches)
-                                requestAnimationFrame(() =>
-                                  document.getElementById('finding-heading')?.focus(),
-                                );
+                                requestAnimationFrame(() => {
+                                  const heading = document.getElementById('finding-heading');
+                                  heading?.focus({ preventScroll: true });
+                                  heading?.scrollIntoView({ block: 'start' });
+                                });
                             }}
                           >
                             <span
@@ -649,7 +654,7 @@ export function App() {
                   </h3>
                   <p>
                     {report.findings.length === 0
-                      ? 'Review Coverage & scope before making your release decision. A clean comparison applies to the assessed profile.'
+                      ? 'Review Coverage before making your release decision. A clean comparison applies to the assessed profile.'
                       : 'Try another category, decision status or search term.'}
                   </p>
                   {report.findings.length > 0 && (
