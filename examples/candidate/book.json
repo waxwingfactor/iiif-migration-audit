@@ -1,0 +1,84 @@
+{
+  "@context": "http://iiif.io/api/presentation/3/context.json",
+  "id": "https://archive.example.org/objects/book-001/manifest",
+  "type": "Manifest",
+  "label": {
+    "en": ["A field notebook"],
+    "fr": ["Un carnet de terrain"]
+  },
+  "summary": {
+    "en": ["Notes and drawings from an imagined expedition."],
+    "fr": ["Notes et dessins d’une expédition imaginaire."]
+  },
+  "rights": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "requiredStatement": {
+    "label": {
+      "en": ["Attribution"]
+    },
+    "value": {
+      "none": ["Synthetic example. No historic collection is represented."]
+    }
+  },
+  "items": [
+    {
+      "id": "https://archive.example.org/objects/book-001/canvas/1",
+      "type": "Canvas",
+      "label": {
+        "none": ["1"]
+      },
+      "width": 1000,
+      "height": 1500,
+      "items": [
+        {
+          "id": "https://archive.example.org/objects/book-001/canvas/1/page",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://archive.example.org/objects/book-001/canvas/1/painting",
+              "type": "Annotation",
+              "motivation": "painting",
+              "target": "https://archive.example.org/objects/book-001/canvas/1",
+              "body": {
+                "id": "https://archive.example.org/objects/book-001/image/1.jpg",
+                "type": "Image",
+                "format": "image/jpeg",
+                "width": 1000,
+                "height": 1500
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "https://archive.example.org/objects/book-001/canvas/2",
+      "type": "Canvas",
+      "label": {
+        "none": ["2"]
+      },
+      "width": 1000,
+      "height": 1500,
+      "items": [
+        {
+          "id": "https://archive.example.org/objects/book-001/canvas/2/page",
+          "type": "AnnotationPage",
+          "items": [
+            {
+              "id": "https://archive.example.org/objects/book-001/canvas/2/painting",
+              "type": "Annotation",
+              "motivation": "painting",
+              "target": "https://archive.example.org/objects/book-001/canvas/2",
+              "body": {
+                "id": "https://archive.example.org/objects/book-001/image/2.jpg",
+                "type": "Image",
+                "format": "image/jpeg",
+                "width": 1000,
+                "height": 1500
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
