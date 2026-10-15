@@ -1,5 +1,5 @@
 import { afterEach, expect, it } from 'vitest';
-import { mkdtemp, cp, writeFile, rm } from 'node:fs/promises';
+import { mkdtemp, cp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { execFile } from 'node:child_process';
@@ -16,6 +16,10 @@ afterEach(async () => {
 
 it('builds a standalone executable that runs outside the repository without node_modules', async () => {
   await execute(process.execPath, ['scripts/build-cli.mjs'], { cwd: resolve('.') });
+  expect(await readFile('dist/cli/index.js', 'utf8')).toContain('Permission is hereby granted');
+  expect(await readFile('dist/cli/THIRD_PARTY_NOTICES.txt', 'utf8')).toContain(
+    'Microsoft Corporation',
+  );
   const directory = await mkdtemp(join(tmpdir(), 'iiif-audit-bundle-'));
   directories.push(directory);
   await cp('dist/cli/index.js', join(directory, 'index.js'));
