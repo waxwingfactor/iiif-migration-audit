@@ -115,3 +115,12 @@ it('accepts a UTF-8 BOM without changing the original snapshot hash', async () =
   const plain = await run(book(), book());
   expect(report.baseline.sha256).not.toBe(plain.baseline.sha256);
 });
+
+it('names the failed input in a parse diagnostic without changing its stable code', async () => {
+  await expect(
+    audit(input(book()), { name: 'replacement.json', text: '{broken' }),
+  ).rejects.toMatchObject({
+    code: 'INVALID_JSON',
+    message: expect.stringContaining('Candidate ("replacement.json")'),
+  });
+});

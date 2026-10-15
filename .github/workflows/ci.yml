@@ -22,3 +22,39 @@ jobs:
       - run: npm run check
       - run: npm test
       - run: npm run format:check
+      - run: npm run build
+      - run: npm run test:package
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser
+        env:
+          IIIF_TEST_PREVIEW: '1'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: failure()
+        with:
+          name: browser-test-evidence
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+  compatibility:
+    name: Compatibility (${{ matrix.os }}, Node ${{ matrix.node }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            node: '22'
+          - os: ubuntu-latest
+            node: '24'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci
+      - run: npm run check
+      - run: npm test
+      - run: npm run build:cli
+      - run: npm run test:package
