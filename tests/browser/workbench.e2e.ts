@@ -206,22 +206,26 @@ test('UTF-8 BOM files retain the same exact evidence hash as the CLI', async ({ 
   const text = `\uFEFF${demo.baseline.text}`;
   const hash = createHash('sha256').update(text, 'utf8').digest('hex');
   await page.goto('/');
-  await page
-    .getByLabel('Choose baseline manifest')
-    .setInputFiles({
-      name: 'before-with-bom.json',
-      mimeType: 'application/json',
-      buffer: Buffer.from(text, 'utf8'),
-    });
-  await page
-    .getByLabel('Choose candidate manifest')
-    .setInputFiles({
-      name: demo.candidate.name,
-      mimeType: 'application/json',
-      buffer: Buffer.from(demo.candidate.text),
-    });
+  await page.getByLabel('Choose baseline manifest').setInputFiles({
+    name: 'before-with-bom.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(text, 'utf8'),
+  });
+  await page.getByLabel('Choose candidate manifest').setInputFiles({
+    name: demo.candidate.name,
+    mimeType: 'application/json',
+    buffer: Buffer.from(demo.candidate.text),
+  });
   await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
   await expect(page.locator('#result-title')).toBeVisible();
   await page.getByRole('tab', { name: /Coverage/ }).click();
   await expect(page.locator('.report-provenance')).toContainText(hash);
+  await page.getByRole('tab', { name: /Findings/ }).click();
+  await page
+    .getByRole('button', { name: /Inspect source/ })
+    .first()
+    .click();
+  await expect(page.getByRole('dialog')).not.toContainText('source excerpt is unavailable');
+  const excerpt = await page.getByRole('dialog').locator('pre').innerText();
+  expect(() => JSON.parse(excerpt)).not.toThrow();
 });

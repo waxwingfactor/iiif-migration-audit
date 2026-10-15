@@ -15,7 +15,12 @@ export function SourceInspector({
   const dialog = useRef<HTMLDialogElement>(null);
   let excerpt = '';
   try {
-    let value: unknown = JSON.parse(inputs[inspector.side].text);
+    const original = inputs[inspector.side].text;
+    // JSON.parse does not accept the transport BOM. Remove it only from this
+    // temporary view; original bytes/text and their evidence hashes stay intact.
+    let value: unknown = JSON.parse(
+      original.charCodeAt(0) === 0xfeff ? original.slice(1) : original,
+    );
     for (const part of (inspector.pointer ?? '').split('/').slice(1)) {
       const key = part.replace(/~1/g, '/').replace(/~0/g, '~');
       if (!value || typeof value !== 'object' || !Object.prototype.hasOwnProperty.call(value, key))
