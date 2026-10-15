@@ -490,6 +490,12 @@ export function App() {
                 </div>
               </details>
             </div>
+            {decisions.length > 0 && (
+              <p className="review-persistence">
+                Review decisions are held in this tab. Export the review policy to save or share
+                them.
+              </p>
+            )}
             <div
               className="result-tabs"
               role="tablist"
@@ -603,7 +609,7 @@ export function App() {
                             <span
                               className={`finding-dot dot-${finding.accepted ? 'accepted' : finding.severity}`}
                             />
-                            <div>
+                            <span className="row-content">
                               <span className="finding-row-meta">
                                 {String(findingPage * 100 + index + 1).padStart(2, '0')} ·{' '}
                                 {categoryLabels[finding.category] ?? finding.category}
@@ -611,7 +617,7 @@ export function App() {
                               </span>
                               <strong>{finding.message}</strong>
                               <code>{finding.path}</code>
-                            </div>
+                            </span>
                             <span className="row-chevron" aria-hidden="true">
                               ›
                             </span>

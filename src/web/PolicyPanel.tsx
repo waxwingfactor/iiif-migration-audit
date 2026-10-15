@@ -18,6 +18,7 @@ export function PolicyPanel({
   decisions: AcceptedChange[];
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
+  const importRequest = useRef(0);
   const [savedPage, setSavedPage] = useState(0);
   useEffect(() => setSavedPage(0), [decisions.length]);
   const updateRule = (index: number, field: 'scope' | 'fromPrefix' | 'toPrefix', value: string) =>
@@ -27,6 +28,16 @@ export function PolicyPanel({
         i === index ? { ...rule, [field]: value } : rule,
       ),
     });
+  const exportPolicy = () => {
+    try {
+      const validated = parsePolicy(JSON.stringify({ ...policy, acceptedChanges: decisions }));
+      saveFile(JSON.stringify(validated, null, 2), 'iiif-audit-policy.json', 'application/json');
+    } catch (error) {
+      onError(
+        `Complete or remove invalid policy entries before exporting: ${(error as Error).message}`,
+      );
+    }
+  };
   return (
     <section className="policy-panel" aria-labelledby="policy-title">
       <div className="section-title-row">
@@ -42,17 +53,7 @@ export function PolicyPanel({
           >
             Import policy
           </button>
-          <button
-            type="button"
-            className="button button-subtle"
-            onClick={() =>
-              saveFile(
-                JSON.stringify({ ...policy, acceptedChanges: decisions }, null, 2),
-                'iiif-audit-policy.json',
-                'application/json',
-              )
-            }
-          >
+          <button type="button" className="button button-subtle" onClick={exportPolicy}>
             Export policy
           </button>
         </div>
@@ -67,11 +68,13 @@ export function PolicyPanel({
         onChange={async (event) => {
           const file = event.target.files?.[0];
           if (!file) return;
+          const currentRequest = ++importRequest.current;
           try {
             const input = await readFile(file);
-            onChange(parsePolicy(input.text));
+            const parsed = parsePolicy(input.text);
+            if (currentRequest === importRequest.current) onChange(parsed);
           } catch (error) {
-            onError((error as Error).message);
+            if (currentRequest === importRequest.current) onError((error as Error).message);
           }
           event.target.value = '';
         }}
@@ -161,13 +164,13 @@ export function PolicyPanel({
           + Add URL rule
         </button>
         <span>
-          {decisions.length} saved {decisions.length === 1 ? 'decision' : 'decisions'} · Changing
-          inputs or rules invalidates affected approvals.
+          {decisions.length} review {decisions.length === 1 ? 'decision' : 'decisions'} in this tab
+          · Changing inputs or rules invalidates affected approvals.
         </span>
       </div>
       {decisions.length > 0 && (
         <details className="saved-decisions">
-          <summary>Inspect or remove saved decisions ({decisions.length})</summary>
+          <summary>Inspect or remove decisions ({decisions.length})</summary>
           <p>
             Remove a stale decision here, then compare again. The original evidence stays in the
             input files.

@@ -778,6 +778,11 @@ h1 {
 .export-menu button:hover {
   background: #edf3fa;
 }
+.review-persistence {
+  padding: 0 28px 17px;
+  color: var(--muted);
+  font-size: 11px;
+}
 .result-tabs {
   display: flex;
   gap: 26px;
@@ -897,7 +902,7 @@ h1 {
   background: #edf3fb;
   border-left-color: var(--blue);
 }
-.finding-row > div {
+.finding-row .row-content {
   min-width: 0;
   flex: 1;
 }

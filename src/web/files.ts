@@ -26,7 +26,10 @@ export async function readFile(file: File): Promise<AuditInput> {
       `This file is ${formatSize(file.size)}. Choose a manifest under ${formatSize(MAX_INPUT_BYTES)}.`,
     );
   try {
-    const text = new TextDecoder('utf-8', { fatal: true }).decode(await file.arrayBuffer());
+    // Preserve a UTF-8 BOM in the input text so browser/CLI evidence hashes agree.
+    const text = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(
+      await file.arrayBuffer(),
+    );
     return { name: file.name, text };
   } catch {
     throw new Error(

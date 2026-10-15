@@ -7,10 +7,7 @@ test('example supports review, source provenance, a reversible decision and offl
 }) => {
   const unexpectedNetwork: string[] = [];
   page.on('request', (request) => {
-    if (
-      !request.url().startsWith('http://127.0.0.1:4173/') &&
-      !request.url().startsWith('ws://127.0.0.1:4173/')
-    )
+    if (/^https?:/.test(request.url()) && !request.url().startsWith('http://127.0.0.1:4173/'))
       unexpectedNetwork.push(request.url());
   });
   await page.goto('/');

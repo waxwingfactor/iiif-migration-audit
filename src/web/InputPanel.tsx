@@ -139,7 +139,10 @@ export function InputPanel({
               <button
                 type="button"
                 className="text-button"
-                onClick={() => onChange({ name: '', text: '' })}
+                onClick={() => {
+                  fileRequest.current += 1;
+                  onChange({ name: '', text: '' });
+                }}
               >
                 Clear
               </button>

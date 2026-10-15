@@ -37,7 +37,7 @@ For example, an **Image service** rule can map `https://old.example/images/` to 
 
 **Import policy** reads the versioned JSON policy used by the CLI and browser. **Export policy** saves the current rules and review decisions. No policy is stored automatically.
 
-Use **Inspect or remove saved decisions** to read imported reasons and remove stale approvals, then compare again. Removing a decision never edits the original manifests.
+Use **Inspect or remove decisions** to read imported reasons and remove stale approvals, then compare again. Removing a decision never edits the original manifests.
 
 ## Record and resume a review
 
