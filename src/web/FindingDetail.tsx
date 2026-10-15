@@ -27,10 +27,16 @@ function Evidence({
         <h4>{title}</h4>
         <span>{side === 'baseline' ? 'Before' : 'After'}</span>
       </div>
-      <pre className={value === null ? 'missing-value' : ''}>{preview}</pre>
+      <pre
+        className={value === null ? 'missing-value' : ''}
+        tabIndex={0}
+        aria-label={`${title} evidence`}
+      >
+        {preview}
+      </pre>
       <div className="source-pointer">
         <span>Source pointer</span>
-        <code>{pointer ?? 'No corresponding value'}</code>
+        <code tabIndex={0}>{pointer ?? 'No corresponding value'}</code>
         {pointer !== null && (
           <button
             type="button"

@@ -42,6 +42,8 @@ export function App() {
   const [inspector, setInspector] = useState<Inspector | null>(null);
   const worker = useRef<Worker | null>(null);
   const requestId = useRef(0);
+  const inputResetVersion = useRef(0);
+  const policyResetVersion = useRef(0);
   const resultHeading = useRef<HTMLHeadingElement>(null);
   const report = useMemo<AuditReport | null>(
     () => (originalReport ? applyDecisions(originalReport, decisions) : null),
@@ -112,6 +114,7 @@ export function App() {
   }
 
   function updatePolicy(next: AuditPolicy) {
+    policyResetVersion.current += 1;
     invalidate();
     setPolicy(next);
     setDecisions(next.acceptedChanges);
@@ -183,6 +186,9 @@ export function App() {
   }
 
   function exploreDemo() {
+    // A new explicit reset supersedes reads even when the demo text is unchanged.
+    inputResetVersion.current += 1;
+    policyResetVersion.current += 1;
     invalidate();
     const cleanPolicy = emptyPolicy();
     setInputs(demo);
@@ -193,6 +199,7 @@ export function App() {
   }
 
   function accept(id: string, reason: string) {
+    policyResetVersion.current += 1;
     const next = [
       ...decisions.filter((decision) => decision.findingId !== id),
       { findingId: id, reason },
@@ -202,6 +209,7 @@ export function App() {
   }
 
   function resetDecision(id: string) {
+    policyResetVersion.current += 1;
     const next = decisions.filter((decision) => decision.findingId !== id);
     setDecisions(next);
     setPolicy((current) => ({ ...current, acceptedChanges: next }));
@@ -333,6 +341,7 @@ export function App() {
             value={inputs.baseline}
             onChange={(value) => updateInput('baseline', value)}
             onError={displayError}
+            getResetVersion={() => inputResetVersion.current}
           />
           <span className="pair-arrow">
             <Icon name="arrow" size={22} />
@@ -342,6 +351,7 @@ export function App() {
             value={inputs.candidate}
             onChange={(value) => updateInput('candidate', value)}
             onError={displayError}
+            getResetVersion={() => inputResetVersion.current}
           />
         </div>
         <div className="action-bar">
@@ -384,6 +394,7 @@ export function App() {
             onChange={updatePolicy}
             onError={displayError}
             decisions={report ? decisions : policy.acceptedChanges}
+            getResetVersion={() => policyResetVersion.current}
           />
         )}
         {error && (
@@ -689,7 +700,7 @@ export function App() {
               </div>
               <div className="page-sequence">
                 <span>Candidate order</span>
-                <div>
+                <div tabIndex={0} role="region" aria-label="Candidate page sequence">
                   {[...report.canvasPairs]
                     .sort((a, b) => a.candidateIndex - b.candidateIndex)
                     .slice(0, 200)
@@ -711,7 +722,12 @@ export function App() {
                     : ''}
                 </p>
               </div>
-              <div className="table-scroll">
+              <div
+                className="table-scroll"
+                tabIndex={0}
+                role="region"
+                aria-label="Canvas pairing table"
+              >
                 <table className="pair-table">
                   <caption>Matched Canvas identities, in baseline order</caption>
                   <thead>

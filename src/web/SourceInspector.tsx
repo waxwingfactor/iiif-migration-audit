@@ -59,7 +59,9 @@ export function SourceInspector({
         </button>
       </div>
       <code className="dialog-pointer">{inspector.pointer || '(document root)'}</code>
-      <pre>{excerpt}</pre>
+      <pre tabIndex={0} role="region" aria-label="Source JSON excerpt">
+        {excerpt}
+      </pre>
       <p className="muted">
         Read-only excerpt from the original JSON. Text and URLs are displayed without executing or
         fetching them.

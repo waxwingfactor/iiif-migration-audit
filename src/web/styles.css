@@ -69,6 +69,10 @@ summary:focus-visible {
   outline: 3px solid #6d9be0;
   outline-offset: 3px;
 }
+[tabindex='0']:focus-visible {
+  outline: 3px solid #6d9be0;
+  outline-offset: 3px;
+}
 h1,
 h2,
 h3,

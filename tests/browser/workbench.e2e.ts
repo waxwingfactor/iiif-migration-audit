@@ -1,7 +1,51 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { createHash } from 'node:crypto';
 import AxeBuilder from '@axe-core/playwright';
 import { demo } from '../../src/web/demo';
+
+interface FileGateWindow extends Window {
+  __iiifPendingReads: number;
+  __iiifReleaseReads: () => Promise<void>;
+}
+
+async function installFileReadGate(page: Page) {
+  await page.addInitScript(() => {
+    const original = File.prototype.arrayBuffer;
+    const pending: Array<() => Promise<void>> = [];
+    const controlled = window as FileGateWindow;
+    controlled.__iiifPendingReads = 0;
+    controlled.__iiifReleaseReads = async () => {
+      await Promise.all(pending.splice(0).map((release) => release()));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+      await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
+    };
+    File.prototype.arrayBuffer = function () {
+      if (!this.name.startsWith('delayed-')) return original.call(this);
+      controlled.__iiifPendingReads += 1;
+      return new Promise<ArrayBuffer>((resolve, reject) => {
+        pending.push(async () => {
+          try {
+            resolve(await original.call(this));
+          } catch (error) {
+            reject(error);
+          } finally {
+            controlled.__iiifPendingReads -= 1;
+          }
+        });
+      });
+    };
+  });
+}
+
+async function releaseFileReads(page: Page) {
+  await page.evaluate(() => (window as FileGateWindow).__iiifReleaseReads());
+}
+
+async function expectPendingFileRead(page: Page) {
+  await expect
+    .poll(() => page.evaluate(() => (window as FileGateWindow).__iiifPendingReads))
+    .toBe(1);
+}
 
 test('example supports review, source provenance, a reversible decision and offline exports', async ({
   page,
@@ -24,6 +68,10 @@ test('example supports review, source provenance, a reversible decision and offl
     .click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page.getByRole('dialog')).toContainText('alder-notebook-before.json');
+  const excerpt = page.getByRole('region', { name: 'Source JSON excerpt' });
+  await excerpt.focus();
+  await expect(excerpt).toBeFocused();
+  expect((await new AxeBuilder({ page }).analyze()).violations).toEqual([]);
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).toHaveCount(0);
   await page
@@ -228,4 +276,120 @@ test('UTF-8 BOM files retain the same exact evidence hash as the CLI', async ({ 
   await expect(page.getByRole('dialog')).not.toContainText('source excerpt is unavailable');
   const excerpt = await page.getByRole('dialog').locator('pre').innerText();
   expect(() => JSON.parse(excerpt)).not.toThrow();
+});
+
+for (const side of ['baseline', 'candidate'] as const) {
+  test(`a delayed ${side} import cannot replace newer demo, paste, clear or file choices`, async ({
+    page,
+  }) => {
+    await installFileReadGate(page);
+    await page.goto('/');
+    const panel = page.locator('.input-panel').nth(side === 'baseline' ? 0 : 1);
+    const chooser = page.getByLabel(`Choose ${side} manifest`);
+    const source = demo[side];
+    for (const intent of ['demo', 'paste', 'clear', 'file'] as const) {
+      await page.getByRole('button', { name: 'Explore an example' }).click();
+      await expect(page.locator('#result-title')).toBeVisible();
+      await chooser.setInputFiles({
+        name: `delayed-${side}.json`,
+        mimeType: 'application/json',
+        buffer: Buffer.from(source.text),
+      });
+      await expectPendingFileRead(page);
+      if (intent === 'demo') {
+        // Values are deliberately identical: a reset must have its own generation.
+        await page.getByRole('button', { name: 'Explore an example' }).click();
+        await expect(page.locator('#result-title')).toBeVisible();
+      } else if (intent === 'file') {
+        await panel.getByRole('button', { name: 'File', exact: true }).click();
+        await chooser.setInputFiles({
+          name: `fresh-${side}.json`,
+          mimeType: 'application/json',
+          buffer: Buffer.from(source.text),
+        });
+        await expect(panel.locator('.file-name')).toHaveText(`fresh-${side}.json`);
+      } else {
+        await panel.getByRole('button', { name: 'Paste', exact: true }).click();
+        if (intent === 'paste') await panel.locator('textarea').fill(`${source.text}\n`);
+        else await panel.getByRole('button', { name: 'Clear', exact: true }).click();
+      }
+      await releaseFileReads(page);
+      if (intent === 'demo') {
+        await expect(page.locator('#result-title')).toBeVisible();
+        await expect(panel.locator('.file-name')).toHaveText(source.name);
+      } else if (intent === 'file')
+        await expect(panel.locator('.file-name')).toHaveText(`fresh-${side}.json`);
+      else
+        await expect(panel.locator('textarea')).toHaveValue(
+          intent === 'paste' ? `${source.text}\n` : '',
+        );
+    }
+  });
+}
+
+test('delayed policy imports cannot override newer rules, decisions, imports or demo resets', async ({
+  page,
+}) => {
+  await installFileReadGate(page);
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Explore an example' }).click();
+  await expect(page.locator('#result-title')).toBeVisible();
+  await page.getByRole('button', { name: /Comparison policy/ }).click();
+  const chooser = page.getByLabel('Import comparison policy');
+  const empty = { schemaVersion: '1.0', uriRules: [], acceptedChanges: [] };
+  const oldRule = {
+    scope: 'image-service',
+    fromPrefix: 'https://obsolete.example/images/',
+    toPrefix: 'https://replacement.example/images/',
+  };
+  const startOldImport = async (policy: unknown) => {
+    await chooser.setInputFiles({
+      name: 'delayed-policy.json',
+      mimeType: 'application/json',
+      buffer: Buffer.from(JSON.stringify(policy)),
+    });
+    await expectPendingFileRead(page);
+  };
+  await startOldImport(empty);
+  await page.getByRole('button', { name: '+ Add URL rule', exact: true }).click();
+  await releaseFileReads(page);
+  await expect(page.getByLabel('Baseline prefix')).toHaveCount(1);
+  await startOldImport(empty);
+  await page.getByLabel('Baseline prefix').fill('https://newer.example/images/');
+  await releaseFileReads(page);
+  await expect(page.getByLabel('Baseline prefix')).toHaveValue('https://newer.example/images/');
+  await startOldImport({ ...empty, uriRules: [oldRule] });
+  await page.getByRole('button', { name: 'Remove URL rule 1' }).click();
+  await releaseFileReads(page);
+  await expect(page.getByLabel('Baseline prefix')).toHaveCount(0);
+
+  await page.getByRole('button', { name: 'Compare manifests', exact: true }).click();
+  await expect(page.locator('#result-title')).toBeVisible();
+  await page.getByLabel('Is this change intentional?').fill('This is the newer reviewed decision.');
+  await page.getByRole('button', { name: 'Accept with reason' }).click();
+  const fingerprint = await page.locator('.finding-code span').getAttribute('title');
+  await startOldImport({
+    ...empty,
+    acceptedChanges: [{ findingId: fingerprint, reason: 'Obsolete decision' }],
+  });
+  await page.locator('.saved-decisions summary').click();
+  await page.getByRole('button', { name: /Remove saved decision/ }).click();
+  await releaseFileReads(page);
+  await expect(page.locator('.policy-footer')).toContainText('0 review decisions');
+
+  await startOldImport({ ...empty, uriRules: [oldRule] });
+  await page.getByRole('button', { name: 'Explore an example' }).click();
+  await expect(page.locator('#result-title')).toBeVisible();
+  await releaseFileReads(page);
+  await expect(page.locator('#result-title')).toBeVisible();
+  await page.getByRole('button', { name: /Comparison policy/ }).click();
+  await expect(page.getByLabel('Baseline prefix')).toHaveCount(0);
+  await startOldImport({ ...empty, uriRules: [oldRule] });
+  await chooser.setInputFiles({
+    name: 'newer-policy.json',
+    mimeType: 'application/json',
+    buffer: Buffer.from(JSON.stringify(empty)),
+  });
+  await releaseFileReads(page);
+  await expect(page.getByLabel('Baseline prefix')).toHaveCount(0);
 });

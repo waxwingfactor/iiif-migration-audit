@@ -10,11 +10,13 @@ export function InputPanel({
   value,
   onChange,
   onError,
+  getResetVersion,
 }: {
   side: Side;
   value: AuditInput;
   onChange: (value: AuditInput) => void;
   onError: (message: string) => void;
+  getResetVersion: () => number;
 }) {
   const [mode, setMode] = useState<'file' | 'paste'>('file');
   const [dragging, setDragging] = useState(false);
@@ -25,11 +27,14 @@ export function InputPanel({
   const selectFile = async (file: File | undefined) => {
     if (!file) return;
     const currentRequest = ++fileRequest.current;
+    const resetAtStart = getResetVersion();
+    const isCurrent = () =>
+      currentRequest === fileRequest.current && resetAtStart === getResetVersion();
     try {
       const loaded = await readFile(file);
-      if (currentRequest === fileRequest.current) onChange(loaded);
+      if (isCurrent()) onChange(loaded);
     } catch (error) {
-      if (currentRequest === fileRequest.current) onError((error as Error).message);
+      if (isCurrent()) onError((error as Error).message);
     }
     if (input.current) input.current.value = '';
   };

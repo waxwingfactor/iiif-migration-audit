@@ -11,18 +11,24 @@ export function PolicyPanel({
   onChange,
   onError,
   decisions,
+  getResetVersion,
 }: {
   policy: AuditPolicy;
   onChange: (policy: AuditPolicy) => void;
   onError: (message: string) => void;
   decisions: AcceptedChange[];
+  getResetVersion: () => number;
 }) {
   const fileInput = useRef<HTMLInputElement>(null);
   const importRequest = useRef(0);
   const [savedPage, setSavedPage] = useState(0);
   useEffect(() => setSavedPage(0), [decisions.length]);
+  const commitPolicy = (next: AuditPolicy) => {
+    importRequest.current += 1;
+    onChange(next);
+  };
   const updateRule = (index: number, field: 'scope' | 'fromPrefix' | 'toPrefix', value: string) =>
-    onChange({
+    commitPolicy({
       ...policy,
       uriRules: policy.uriRules.map((rule, i) =>
         i === index ? { ...rule, [field]: value } : rule,
@@ -69,12 +75,15 @@ export function PolicyPanel({
           const file = event.target.files?.[0];
           if (!file) return;
           const currentRequest = ++importRequest.current;
+          const resetAtStart = getResetVersion();
+          const isCurrent = () =>
+            currentRequest === importRequest.current && resetAtStart === getResetVersion();
           try {
             const input = await readFile(file);
             const parsed = parsePolicy(input.text);
-            if (currentRequest === importRequest.current) onChange(parsed);
+            if (isCurrent()) commitPolicy(parsed);
           } catch (error) {
-            if (currentRequest === importRequest.current) onError((error as Error).message);
+            if (isCurrent()) onError((error as Error).message);
           }
           event.target.value = '';
         }}
@@ -138,7 +147,10 @@ export function PolicyPanel({
                 className="icon-button remove-rule"
                 aria-label={`Remove URL rule ${index + 1}`}
                 onClick={() =>
-                  onChange({ ...policy, uriRules: policy.uriRules.filter((_, i) => i !== index) })
+                  commitPolicy({
+                    ...policy,
+                    uriRules: policy.uriRules.filter((_, i) => i !== index),
+                  })
                 }
               >
                 <Icon name="close" />
@@ -152,7 +164,7 @@ export function PolicyPanel({
           type="button"
           className="text-button"
           onClick={() =>
-            onChange({
+            commitPolicy({
               ...policy,
               uriRules: [
                 ...policy.uriRules,
@@ -187,7 +199,7 @@ export function PolicyPanel({
                   className="text-button"
                   aria-label={`Remove saved decision ${decision.findingId.slice(0, 12)}`}
                   onClick={() =>
-                    onChange({
+                    commitPolicy({
                       ...policy,
                       acceptedChanges: decisions.filter(
                         (entry) => entry.findingId !== decision.findingId,
