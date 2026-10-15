@@ -7,7 +7,7 @@ The CLI compares saved IIIF Presentation 2.1/3.0 still-image manifests using the
 Use Node.js 22.12 or newer. Download the CLI `.tgz` from this repository's GitHub Releases, then install the downloaded archive:
 
 ```sh
-npm install --global ./iiif-migration-audit-0.1.0.tgz
+npm install --global ./iiif-migration-audit-1.0.0.tgz
 iiif-audit --version
 iiif-audit --help
 ```

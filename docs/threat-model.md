@@ -1,12 +1,12 @@
 # Threat model
 
-Status: initial design review, 2026-10-15. This document describes required controls and release checks; it does not assert that every control is implemented. Update the control status after implementation review.
+Status: implementation reviewed for release 1.0.0, 2026-10-15. The threat analysis below retains the design requirements. The implementation evidence and residual limits are recorded at the end; this is not a security certification.
 
 ## Assets, actors and boundaries
 
 The product is an offline comparison tool for digital-library engineers. Its important assets are the accuracy of a migration decision, the integrity of reviewed approvals, the operator's local files, and confidentiality of unpublished metadata. Its output is evidence about explicitly assessed manifest properties, not a certificate that content, remote services, authorization or viewer behaviour is correct.
 
-Treat every manifest, property, identifier, label, URL, filename and imported report as untrusted. A malicious provider or contributor can deliberately craft files that are later processed by a librarian or CI. Trusted operator input is limited to selecting files, choosing output destinations and intentionally creating policy/approval files. A pull request author may propose policy changes, but does not thereby receive authority to approve their own changes. Security of the host browser/Node runtime and a compromised local OS are outside the application's boundary.
+Treat every manifest, property, identifier, label, URL, filename and imported policy as untrusted. Reports are export-only evidence, not imported executable sessions. A malicious provider or contributor can deliberately craft files that are later processed by a librarian or CI. Trusted operator input is limited to selecting files, choosing output destinations and intentionally creating policy/approval files. A pull request author may propose policy changes, but does not thereby receive authority to approve their own changes. Security of the host browser/Node runtime and a compromised local OS are outside the application's boundary.
 
 The browser reads selected files into memory. The CLI reads explicitly selected local inputs and writes explicitly selected report files. Parsed source objects enter a bounded normalizer; normalized objects enter the comparison engine; structured findings enter report rendering; optional approval records can change a finding's review status. No stage may turn manifest text into executable code, a filesystem path, a background network request or an approval instruction.
 
@@ -74,7 +74,7 @@ Release checks: `../` entries, absolute paths, symlinks escaping root, encoded s
 
 ### P2: Prototype pollution and unexpected JavaScript values
 
-`JSON.parse` does not by itself make keys safe for merging. Treat `__proto__`, `constructor` and `prototype` as data; never assign arbitrary keys to prototype-bearing dictionaries or merge input into configuration objects. Use `Map`, null-prototype dictionaries, own-property checks and explicit schema projection. Avoid `Object.assign` from untrusted objects into normal targets, recursive generic merge utilities and dynamic property access that calls inherited methods.
+`JSON.parse` does not by itself make keys safe for merging. The strict source parser rejects `__proto__`, `constructor` and `prototype` keys at any depth. Never assign arbitrary keys to prototype-bearing dictionaries or merge input into configuration objects. Use `Map`, null-prototype dictionaries, own-property checks and explicit schema projection. Avoid `Object.assign` from untrusted objects into normal targets, recursive generic merge utilities and dynamic property access that calls inherited methods.
 
 The public library boundary should accept unknown JSON-shaped values and validate them; do not assume TypeScript types validate runtime data. Do not trust user-defined `toString`/`toJSON` methods on arbitrary caller objects. Do not mutate the supplied object.
 
@@ -103,4 +103,14 @@ Release checks: reproducible clean installation from lockfile, packed CLI smoke 
 
 ## Independent review status
 
-Two independent agent reviews of the foundation found no remaining architecture/type blockers after input-bound fingerprints and role-scoped URI rules were specified. These are design reviews, not evidence of an implemented control. Implementation and release review must verify each applicable control rather than treating this document as evidence that the system is secure.
+Foundation, core and CLI implementation reviews are recorded in `docs/reviews/`. Independent tests reproduced bugs and verified their fixes; agent review is not a substitute for a dedicated external security audit.
+
+Implemented evidence:
+
+- Core acceptance and hardening tests exercise duplicate keys, reserved keys, malformed and numerically lossy JSON, unsupported shapes, resource budgets, identity collisions, exact hashes and stale approvals.
+- CLI tests exercise real filesystem aliases, missing/duplicate pairs, containment, atomic/no-overwrite output, complete corpus accounting, fatal UTF-8 and bounded explicit snapshots. The independent reviewer found and verified fixes for surviving-input overwrite cases.
+- HTML is scriptless, escaped and self-contained with a restrictive CSP. CSV neutralizes formula prefixes. Browser journeys and independent Chromium review exercise hostile values without execution or linked-resource requests.
+- Production browser output includes a CSP that denies outbound fetches. The development server uses Vite HMR and does not apply that production policy. UI imports are explicit, comparisons use a worker, and exported policies/reports are the only persistence.
+- Actions are pinned to full commits, pull-request checks receive no publishing secrets, main is protected, and CLI package contents plus an offline installation are smoke-tested. The exact locked dependency advisory query found no reported vulnerabilities on 2026-10-15; that is time-bound and does not prove absence of vulnerabilities.
+
+Residual limits: manifests and reports remain in process memory while open; exports intentionally contain original evidence, including any secrets supplied as manifest data. Input budgets reduce exhaustion risk but do not guarantee a fixed maximum runtime or memory use. A local filesystem adversary can race operator-selected paths; this is not a privileged service or sandbox against a compromised host. The explicit snapshot command can access an operator-selected local HTTP endpoint and is not suitable as an untrusted multi-user fetching service. Browser qualification is Chromium; engine/runtime, conformance, remote bytes and legal correctness remain outside the preservation claim.

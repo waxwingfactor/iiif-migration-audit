@@ -1,6 +1,6 @@
 {
   "name": "iiif-migration-audit",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Independent preservation checks for IIIF manifest migrations",
   "type": "module",
   "license": "MIT",
@@ -16,7 +16,16 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "dev": "vite --host 127.0.0.1",
+    "build": "npm run build:cli && npm run build:web",
+    "build:cli": "node scripts/build-cli.mjs",
+    "build:web": "vite build && node scripts/postbuild-web.mjs",
+    "preview": "vite preview --host 127.0.0.1",
+    "cli": "tsx src/cli/index.ts",
+    "test:browser": "playwright test --config tests/browser/playwright.config.ts",
+    "prepack": "npm run build:cli",
+    "test:package": "node scripts/smoke-package.mjs"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.14.0",
@@ -34,5 +43,19 @@
     "jsonc-parser": "^3.3.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"
-  }
+  },
+  "bin": {
+    "iiif-audit": "dist/cli/index.js"
+  },
+  "files": [
+    "dist/cli",
+    "docs",
+    "examples",
+    "LICENSE",
+    "README.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "THIRD_PARTY_NOTICES.md"
+  ]
 }

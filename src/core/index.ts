@@ -19,7 +19,7 @@ import type {
 export * from './types';
 export { AuditError, MAX_INPUT_BYTES, MAX_DEPTH, MAX_NODES, MAX_CANVASES } from './parser';
 export { emptyPolicy, parsePolicy } from './policy';
-export const TOOL_VERSION = '0.1.0';
+export const TOOL_VERSION = '1.0.0';
 export const PROFILE_VERSION = 'static-image-1' as const;
 export const FINGERPRINT_VERSION = '1' as const;
 
@@ -164,8 +164,21 @@ export async function audit(
   )
     throw new AuditError('INVALID_INPUT', 'Both inputs need a name and JSON text.');
   const policy = validatePolicy(options.policy ?? emptyPolicy());
-  const baselineDocument = parseJson(baselineInput.text);
-  const candidateDocument = parseJson(candidateInput.text);
+  const parseInput = (input: AuditInput, side: string) => {
+    try {
+      return parseJson(input.text);
+    } catch (error) {
+      if (error instanceof AuditError)
+        throw new AuditError(
+          error.code,
+          `${side} (${JSON.stringify(input.name)}): ${error.message}`,
+          error.pointer,
+        );
+      throw error;
+    }
+  };
+  const baselineDocument = parseInput(baselineInput, 'Baseline');
+  const candidateDocument = parseInput(candidateInput, 'Candidate');
   const baseline = extract(baselineDocument, 'baseline');
   const candidate = extract(candidateDocument, 'candidate');
   const [baselineHash, candidateHash] = await Promise.all([

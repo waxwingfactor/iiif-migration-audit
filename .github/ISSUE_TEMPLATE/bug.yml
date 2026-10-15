@@ -1,0 +1,28 @@
+name: Report a reproducible problem
+description: Incorrect preservation findings, unsupported coverage, installation or interface problems
+title: '[Bug] '
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach private collection metadata, credentials or unpublished reports. Use a minimal synthetic manifest. Report security vulnerabilities through the repository security advisory form.
+  - type: input
+    id: version
+    attributes:
+      label: Version and environment
+      placeholder: 1.0.0; browser + OS or Node version
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps and minimal public or synthetic inputs
+      description: Include the command or browser actions and the policy, if relevant. Plain JSON attachments are preferred over screenshots of source text.
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: Expected and actual behavior
+      description: Include finding codes, coverage notices or error messages. A standards reference helps for new IIIF constructs.
+    validations:
+      required: true
