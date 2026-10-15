@@ -1,0 +1,10 @@
+{
+  "schemaVersion": "1.0",
+  "pairs": [
+    {
+      "key": "field-notebook",
+      "baseline": "baseline/book.json",
+      "candidate": "candidate/book-loss.json"
+    }
+  ]
+}

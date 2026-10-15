@@ -1,0 +1,79 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://archive.example.org/objects/book-001/manifest",
+  "@type": "sc:Manifest",
+  "label": [
+    {
+      "@value": "A field notebook",
+      "@language": "en"
+    },
+    {
+      "@value": "Un carnet de terrain",
+      "@language": "fr"
+    }
+  ],
+  "description": [
+    {
+      "@value": "Notes and drawings from an imagined expedition.",
+      "@language": "en"
+    },
+    {
+      "@value": "Notes et dessins d’une expédition imaginaire.",
+      "@language": "fr"
+    }
+  ],
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "attribution": "Synthetic example. No historic collection is represented.",
+  "sequences": [
+    {
+      "@id": "https://archive.example.org/objects/book-001/sequence/default",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://archive.example.org/objects/book-001/canvas/1",
+          "@type": "sc:Canvas",
+          "label": "1",
+          "width": 1000,
+          "height": 1500,
+          "images": [
+            {
+              "@id": "https://archive.example.org/objects/book-001/canvas/1/painting",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://archive.example.org/objects/book-001/canvas/1",
+              "resource": {
+                "@id": "https://archive.example.org/objects/book-001/image/1.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 1000,
+                "height": 1500
+              }
+            }
+          ]
+        },
+        {
+          "@id": "https://archive.example.org/objects/book-001/canvas/2",
+          "@type": "sc:Canvas",
+          "label": "2",
+          "width": 1000,
+          "height": 1500,
+          "images": [
+            {
+              "@id": "https://archive.example.org/objects/book-001/canvas/2/painting",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "on": "https://archive.example.org/objects/book-001/canvas/2",
+              "resource": {
+                "@id": "https://archive.example.org/objects/book-001/image/2.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 1000,
+                "height": 1500
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
