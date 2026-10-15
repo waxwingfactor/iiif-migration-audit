@@ -1,0 +1,17 @@
+name: Describe a preservation workflow
+description: Request support for an IIIF construct or migration-review use case
+body:
+  - type: textarea
+    id: workflow
+    attributes:
+      label: Who needs this, and what release decision is blocked?
+      description: Describe the current workaround and the smallest useful outcome.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Public example and preservation expectation
+      description: Use public or synthetic inputs and link the IIIF specification or recipe when possible. Do not attach private metadata.
+    validations:
+      required: true
