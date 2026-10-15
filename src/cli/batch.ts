@@ -1,7 +1,7 @@
 import { opendir, realpath } from 'node:fs/promises';
 import { basename, dirname, relative, resolve } from 'node:path';
 import { visit } from 'jsonc-parser';
-import { audit, applyDecisions, MAX_INPUT_BYTES, TOOL_VERSION } from '../core/index';
+import { audit, applyDecisions, AuditError, MAX_INPUT_BYTES, TOOL_VERSION } from '../core/index';
 import type { AuditPolicy } from '../core/types';
 import {
   CliError,
@@ -121,15 +121,17 @@ export function parsePairs(text: string): PairDefinition[] {
 }
 
 export function describeError(error: unknown): { code: string; message: string } {
+  if (error instanceof CliError || error instanceof AuditError)
+    return { code: error.code, message: error.message };
   if (error instanceof Error) {
     const code =
       'code' in error && typeof error.code === 'string' ? error.code : 'UNEXPECTED_ERROR';
     return {
       code,
       message:
-        code === 'UNEXPECTED_ERROR'
-          ? 'The audit could not complete. No successful result was produced.'
-          : error.message,
+        'The operation could not complete (' +
+        code +
+        '). Check the selected files and directories. No successful result was produced.',
     };
   }
   return {
