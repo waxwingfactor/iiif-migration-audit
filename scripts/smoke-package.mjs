@@ -1,7 +1,7 @@
 import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdtempSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join, resolve } from 'node:path';
+import { join, resolve, posix } from 'node:path';
 import assert from 'node:assert/strict';
 
 const root = process.cwd();
@@ -29,6 +29,19 @@ try {
     !packed.files.some((file) => /(^|\/)(\.env|node_modules|tests|work)(\/|$)/.test(file.path)),
     'Private/development files leaked into package.',
   );
+  const shippedPaths = new Set(packed.files.map((file) => file.path));
+  for (const file of packed.files.filter((entry) => entry.path.endsWith('.md'))) {
+    const text = readFileSync(join(root, file.path), 'utf8');
+    for (const match of text.matchAll(/\]\(([^)]+)\)/g)) {
+      const href = match[1].split('#')[0];
+      if (!href || /^[a-z][a-z0-9+.-]*:/i.test(href)) continue;
+      const destination = posix.normalize(posix.join(posix.dirname(file.path), href));
+      assert.ok(
+        shippedPaths.has(destination),
+        `Broken packaged documentation link: ${file.path} -> ${href}`,
+      );
+    }
+  }
   const install = join(scratch, 'install');
   execFileSync(
     npm,

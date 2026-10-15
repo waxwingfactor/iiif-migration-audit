@@ -8,7 +8,7 @@ IIIF Migration Audit compares saved IIIF Presentation 2.1 and 3.0 manifests for 
 
 ## Try a real workflow
 
-Open the workbench and choose **Explore example** to see a fictional migration with deliberately lost information. Then load your own baseline and candidate JSON files, inspect findings and source pointers, and export a review report. Add explicit URI mappings for planned host changes; accept an intentional change only with a reason. Export your policy to resume or reproduce that exact review in the CLI.
+Open the workbench and choose **Explore an example** to see a fictional migration with deliberately lost information. Then load your own baseline and candidate JSON files, inspect findings and source pointers, and export a review report. Add explicit URI mappings for planned host changes; accept an intentional change only with a reason. Export your policy to resume or reproduce that exact review in the CLI.
 
 Comparison runs locally in your browser. There are no accounts, uploads, analytics, remote fonts, linked-resource downloads or automatic saved sessions. The hosting provider receives ordinary application-page requests; use the downloadable static workbench or CLI if even those requests are inappropriate. Reports and policies can contain unpublished metadata, so share them deliberately.
 

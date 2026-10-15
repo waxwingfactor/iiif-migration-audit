@@ -49,12 +49,12 @@
   },
   "files": [
     "dist/cli",
-    "docs/cli.md",
-    "docs/core-api.md",
-    "docs/user-guide.md",
+    "docs",
     "examples",
     "LICENSE",
     "README.md",
+    "CONTRIBUTING.md",
+    "CHANGELOG.md",
     "SECURITY.md",
     "THIRD_PARTY_NOTICES.md"
   ]
