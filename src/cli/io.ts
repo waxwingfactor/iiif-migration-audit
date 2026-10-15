@@ -23,6 +23,20 @@ export async function readTextFile(
   maximum: number,
   budget?: ByteBudget,
 ): Promise<string> {
+  // Avoid blocking on named pipes or devices before the opened-handle check.
+  try {
+    const initial = await stat(path);
+    if (!initial.isFile())
+      throw new CliError('INPUT_NOT_FILE', 'Expected a regular file: ' + basename(path));
+    if (initial.size > maximum)
+      throw new CliError(
+        'INPUT_TOO_LARGE',
+        basename(path) + ' exceeds the ' + maximum + '-byte file limit.',
+      );
+  } catch (error) {
+    if (error instanceof CliError) throw error;
+    throw fileError(error, 'read', path);
+  }
   let handle;
   try {
     handle = await open(path, 'r');

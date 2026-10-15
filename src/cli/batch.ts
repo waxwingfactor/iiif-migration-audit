@@ -15,6 +15,7 @@ import type { BatchIssue, BatchPairResult, BatchReport, PairDefinition } from '.
 
 export const MAX_BATCH_PAIRS = 10_000;
 export const MAX_BATCH_BYTES = 256 * 1024 * 1024;
+export const MAX_BATCH_REPORT_BYTES = 128 * 1024 * 1024;
 export const MAX_CONFIG_BYTES = 4 * 1024 * 1024;
 const MAX_INVENTORY_ENTRIES = 100_000;
 
@@ -146,6 +147,8 @@ export interface BatchOptions {
   candidateDir?: string;
   generatedAt?: string;
   outputPath?: string;
+  /** Constrained embeddings may lower, never raise, the built-in report budget. */
+  reportByteLimit?: number;
 }
 
 export interface BatchRun {
@@ -163,6 +166,14 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
   const baselinePaths = new Set<string>();
   const candidatePaths = new Set<string>();
   const budget: ByteBudget = { used: 0, maximum: MAX_BATCH_BYTES };
+  const reportByteLimit = Math.min(
+    options.reportByteLimit ?? MAX_BATCH_REPORT_BYTES,
+    MAX_BATCH_REPORT_BYTES,
+  );
+  if (!Number.isSafeInteger(reportByteLimit) || reportByteLimit < 1)
+    throw new CliError('BATCH_REPORT_LIMIT', 'The report byte limit must be a positive integer.');
+  let reportBytes = 0;
+  let reportBudgetExhausted = false;
   const unreviewedPolicy: AuditPolicy = {
     schemaVersion: '1.0',
     uriRules: options.policy.uriRules,
@@ -180,6 +191,11 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
       baselinePaths.add(before);
       candidatePaths.add(after);
       inputPaths.push(before, after);
+      if (reportBudgetExhausted)
+        throw new CliError(
+          'BATCH_REPORT_LIMIT',
+          'The aggregate audit-report budget is exhausted. Split the corpus into smaller batches.',
+        );
       if (budget.used > budget.maximum)
         throw new CliError(
           'BATCH_TOO_LARGE',
@@ -192,6 +208,17 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
         { name: basename(definition.candidate), text: candidateText },
         { policy: unreviewedPolicy, generatedAt },
       );
+      const bytes = Buffer.byteLength(JSON.stringify(report), 'utf8');
+      if (reportBytes + bytes > reportByteLimit) {
+        reportBudgetExhausted = true;
+        throw new CliError(
+          'BATCH_REPORT_LIMIT',
+          'This pair would exceed the ' +
+            reportByteLimit +
+            '-byte aggregate audit-report limit. No partial audit for this pair was retained; split the corpus.',
+        );
+      }
+      reportBytes += bytes;
       pairs.push({ ...definition, report, error: null });
     } catch (error) {
       pairs.push({ ...definition, report: null, error: describeError(error) });
@@ -207,13 +234,28 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
         message: 'Saved approval does not match any current finding: ' + decision.findingId,
       });
   }
+  let reviewedBytes = 0;
+  let reviewedBudgetExhausted = false;
   for (const pair of pairs) {
     if (pair.report) {
       const ids = new Set(pair.report.findings.map((finding) => finding.id));
       const decisions = options.policy.acceptedChanges.filter((decision) =>
         ids.has(decision.findingId),
       );
-      pair.report = applyDecisions(pair.report, decisions);
+      const reviewed = applyDecisions(pair.report, decisions);
+      const bytes = Buffer.byteLength(JSON.stringify(reviewed), 'utf8');
+      if (reviewedBudgetExhausted || reviewedBytes + bytes > reportByteLimit) {
+        reviewedBudgetExhausted = true;
+        pair.report = null;
+        pair.error = {
+          code: 'BATCH_REPORT_LIMIT',
+          message:
+            'Reviewed evidence would exceed the aggregate audit-report budget. No partial audit for this pair was retained; split the corpus.',
+        };
+      } else {
+        reviewedBytes += bytes;
+        pair.report = reviewed;
+      }
     }
   }
   for (const side of ['baseline', 'candidate'] as const) {

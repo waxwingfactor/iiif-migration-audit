@@ -3,7 +3,7 @@ import { mkdtemp, readFile, writeFile, mkdir, rm, symlink, link } from 'node:fs/
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { runCli } from '../src/cli/run';
-import { parsePairs } from '../src/cli/batch';
+import { parsePairs, runBatch } from '../src/cli/batch';
 import type { AuditReport } from '../src/core/types';
 import type { BatchReport } from '../src/cli/types';
 
@@ -233,6 +233,34 @@ describe('CLI local workflow', () => {
 });
 
 describe('batch accounting and path boundaries', () => {
+  it('bounds expanded report retention and accounts explicitly for skipped pairs', async () => {
+    const cwd = await workspace();
+    await files(cwd);
+    await writeFile(join(cwd, 'other-before.json'), manifest('Other'));
+    await writeFile(join(cwd, 'other-after.json'), manifest('Other'));
+    await writeFile(
+      join(cwd, 'pairs.json'),
+      JSON.stringify({
+        schemaVersion: '1.0',
+        pairs: [
+          { key: 'first', baseline: 'before.json', candidate: 'after.json' },
+          { key: 'second', baseline: 'other-before.json', candidate: 'other-after.json' },
+        ],
+      }),
+    );
+    const result = await runBatch(join(cwd, 'pairs.json'), {
+      policy: { schemaVersion: '1.0', uriRules: [], acceptedChanges: [] },
+      reportByteLimit: 1,
+    });
+    expect(result.report.status).toBe('error');
+    expect(result.report.summary.processed).toBe(2);
+    expect(result.report.summary.errors).toBe(2);
+    expect(
+      result.report.pairs.every(
+        (pair) => pair.report === null && pair.error?.code === 'BATCH_REPORT_LIMIT',
+      ),
+    ).toBe(true);
+  });
   it('keeps every requested pair when one file is missing', async () => {
     const cwd = await workspace();
     await files(cwd);

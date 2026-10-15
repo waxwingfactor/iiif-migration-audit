@@ -152,7 +152,7 @@ The command's nonzero result fails the step. If you upload reports as CI artifac
 
 ## Limits and report safety
 
-Local manifests are limited to 20 MiB each; the engine additionally bounds nesting, visited nodes and canvases. Batch runs accept up to 10,000 pairs and 256 MiB of source/candidate bytes, a 4 MiB pairs/policy file, and 100,000 inventory entries. Split larger corpora into multiple explicit batches. Limits fail explicitly; a partial successful subset cannot become a pass.
+Local manifests are limited to 20 MiB each; the engine additionally bounds nesting, visited nodes and canvases. Batch runs accept up to 10,000 pairs and 256 MiB of source/candidate bytes, retain at most 128 MiB of serialized nested audit reports, and accept a 4 MiB pairs/policy file and 100,000 inventory entries. Report-size checks also run after applying review decisions. Pairs that exceed the budget receive explicit errors; their evidence is not silently truncated. Split larger corpora into multiple explicit batches. Limits fail explicitly; a partial successful subset cannot become a pass.
 
 HTML reports are self-contained, scriptless, use system fonts and include a restrictive Content Security Policy. Source HTML is escaped, URLs are displayed as text, directional controls are rendered as visible Unicode escapes, and opening a report triggers no remote resource loads. JSON retains the complete structured report. CSV wraps and quotes every cell; cells with formula-leading characters are prefixed with an apostrophe so spreadsheet applications treat them as text. This display transformation is limited to CSV; original evidence remains in JSON. Check original JSON when the exact bytes of a displayed value matter.
 
