@@ -20,6 +20,20 @@ afterEach(async () => {
 });
 
 describe('bounded I/O and explicit snapshot network command', () => {
+  it('preserves a UTF-8 BOM in local and remote evidence without reformatting', async () => {
+    const cwd = await workspace();
+    const text = '\uFEFF{ "id": "https://example.org/legacy" }\r\n';
+    await writeFile(join(cwd, 'bom.json'), text);
+    expect(await readTextFile(join(cwd, 'bom.json'), 1000)).toBe(text);
+    const remote = (async () => new Response(text)) as typeof fetch;
+    const snapshot = await fetchSnapshot('https://example.org/bom', {
+      presentation: '2',
+      maximumBytes: 1000,
+      fetch: remote,
+    });
+    expect(snapshot.text).toBe(text);
+    expect(snapshot.bytes).toBe(Buffer.byteLength(text, 'utf8'));
+  });
   it('retrieves one real local staging response with content negotiation and no credentials', async () => {
     const requests: {
       accept: string | undefined;

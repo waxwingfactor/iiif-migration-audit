@@ -115,7 +115,7 @@ export async function fetchSnapshot(
       }
       // Do not normalize or reserialize: approvals must bind to the exact saved snapshot.
       try {
-        const parsed: unknown = JSON.parse(text);
+        const parsed: unknown = JSON.parse(text.startsWith('\uFEFF') ? text.slice(1) : text);
         if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error();
       } catch {
         throw new CliError(
