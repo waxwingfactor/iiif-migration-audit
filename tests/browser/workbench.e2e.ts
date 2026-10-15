@@ -12,7 +12,7 @@ async function installFileReadGate(page: Page) {
   await page.addInitScript(() => {
     const original = File.prototype.arrayBuffer;
     const pending: Array<() => Promise<void>> = [];
-    const controlled = window as FileGateWindow;
+    const controlled = window as unknown as FileGateWindow;
     controlled.__iiifPendingReads = 0;
     controlled.__iiifReleaseReads = async () => {
       await Promise.all(pending.splice(0).map((release) => release()));
@@ -38,12 +38,12 @@ async function installFileReadGate(page: Page) {
 }
 
 async function releaseFileReads(page: Page) {
-  await page.evaluate(() => (window as FileGateWindow).__iiifReleaseReads());
+  await page.evaluate(() => (window as unknown as FileGateWindow).__iiifReleaseReads());
 }
 
 async function expectPendingFileRead(page: Page) {
   await expect
-    .poll(() => page.evaluate(() => (window as FileGateWindow).__iiifPendingReads))
+    .poll(() => page.evaluate(() => (window as unknown as FileGateWindow).__iiifPendingReads))
     .toBe(1);
 }
 
