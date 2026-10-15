@@ -4,3 +4,6 @@ coverage
 playwright-report
 test-results
 tests/fixtures/vendor
+
+tests/fixtures/official/*.json
+!tests/fixtures/official/SOURCES.json

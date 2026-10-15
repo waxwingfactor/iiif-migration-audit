@@ -1,0 +1,111 @@
+{
+  "@context": "http://iiif.io/api/presentation/2/context.json",
+  "@id": "https://library.example.test/object/book",
+  "@type": "sc:Manifest",
+  "label": [
+    {
+      "@value": "A book",
+      "@language": "en"
+    },
+    {
+      "@value": "Un livre",
+      "@language": "fr"
+    }
+  ],
+  "metadata": [
+    {
+      "label": "Note",
+      "value": "First note"
+    },
+    {
+      "label": "Note",
+      "value": "Second note"
+    }
+  ],
+  "license": "http://creativecommons.org/licenses/by/4.0/",
+  "viewingHint": "paged",
+  "viewingDirection": "right-to-left",
+  "sequences": [
+    {
+      "@id": "https://library.example.test/object/book/sequence/default",
+      "@type": "sc:Sequence",
+      "canvases": [
+        {
+          "@id": "https://library.example.test/object/book/canvas/a",
+          "@type": "sc:Canvas",
+          "label": {
+            "@value": "Blank page",
+            "@language": "en"
+          },
+          "width": 1200,
+          "height": 1800,
+          "images": [
+            {
+              "@id": "https://library.example.test/annotation/a",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.example.test/a.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 1200,
+                "height": 1800
+              },
+              "on": "https://library.example.test/object/book/canvas/a"
+            }
+          ]
+        },
+        {
+          "@id": "https://library.example.test/object/book/canvas/b",
+          "@type": "sc:Canvas",
+          "label": {
+            "@value": "Title page",
+            "@language": "en"
+          },
+          "width": 1200,
+          "height": 1800,
+          "images": [
+            {
+              "@id": "https://library.example.test/annotation/b",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.example.test/b.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 1200,
+                "height": 1800
+              },
+              "on": "https://library.example.test/object/book/canvas/b"
+            }
+          ]
+        },
+        {
+          "@id": "https://library.example.test/object/book/canvas/c",
+          "@type": "sc:Canvas",
+          "label": {
+            "@value": "Blank page",
+            "@language": "en"
+          },
+          "width": 1200,
+          "height": 1800,
+          "images": [
+            {
+              "@id": "https://library.example.test/annotation/c",
+              "@type": "oa:Annotation",
+              "motivation": "sc:painting",
+              "resource": {
+                "@id": "https://images.example.test/c.jpg",
+                "@type": "dctypes:Image",
+                "format": "image/jpeg",
+                "width": 1200,
+                "height": 1800
+              },
+              "on": "https://library.example.test/object/book/canvas/c"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
