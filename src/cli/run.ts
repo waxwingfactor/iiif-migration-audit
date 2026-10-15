@@ -67,6 +67,12 @@ function parseArguments(args: readonly string[]): Arguments {
       positionalOnly = true;
       continue;
     }
+    if (token === '-h' && !positionalOnly) {
+      if (flags.has('help'))
+        throw new CliError('ARGUMENT_DUPLICATE', 'Help was requested more than once.');
+      flags.set('help', true);
+      continue;
+    }
     if (!token.startsWith('--') || positionalOnly) {
       positionals.push(token);
       continue;
@@ -75,8 +81,9 @@ function parseArguments(args: readonly string[]): Arguments {
     const key = equal === -1 ? token.slice(2) : token.slice(2, equal);
     if (flags.has(key))
       throw new CliError('ARGUMENT_DUPLICATE', 'Option --' + key + ' was provided more than once.');
-    if (key === 'force') {
-      if (equal !== -1) throw new CliError('ARGUMENT_VALUE', '--force does not take a value.');
+    if (key === 'force' || key === 'help') {
+      if (equal !== -1)
+        throw new CliError('ARGUMENT_VALUE', '--' + key + ' does not take a value.');
       flags.set(key, true);
     } else {
       const value = equal === -1 ? args[++index] : token.slice(equal + 1);
@@ -146,7 +153,7 @@ export async function runCli(argv: readonly string[], context: CliContext = {}):
   const stdout = context.stdout ?? ((text: string) => process.stdout.write(text));
   const stderr = context.stderr ?? ((text: string) => process.stderr.write(text));
   const cwd = context.cwd ?? process.cwd();
-  if (!argv.length || argv.includes('--help') || argv.includes('-h')) {
+  if (!argv.length || (argv.length === 1 && (argv[0] === '--help' || argv[0] === '-h'))) {
     stdout(HELP);
     return 0;
   }
@@ -156,6 +163,10 @@ export async function runCli(argv: readonly string[], context: CliContext = {}):
   }
   try {
     const args = parseArguments(argv);
+    if (args.flags.get('help')) {
+      stdout(HELP);
+      return 0;
+    }
     validateArguments(args);
     const path = (value: string): string => resolve(cwd, value);
     const policyPath = option(args, 'policy');

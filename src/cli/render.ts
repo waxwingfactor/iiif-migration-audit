@@ -1,4 +1,11 @@
-import { csvRows, escapeHtml, htmlDocument, renderAuditBody, statusLabel } from '../report/index';
+import {
+  auditCsvRows,
+  csvRows,
+  escapeHtml,
+  htmlDocument,
+  renderAuditBody,
+  statusLabel,
+} from '../report/index';
 import type { BatchReport } from './types';
 
 export function renderBatchJson(report: BatchReport): string {
@@ -75,59 +82,8 @@ export function renderBatchCsv(report: BatchReport): string {
       '',
     ]);
     if (!pair.report) continue;
-    for (const side of ['baseline', 'candidate'] as const) {
-      const source = pair.report[side];
-      rows.push([
-        'source',
-        pair.key,
-        '',
-        source.sha256,
-        side,
-        '',
-        '',
-        '',
-        source.name,
-        JSON.stringify(source.id),
-        JSON.stringify(source.version),
-        '',
-        '',
-        '',
-      ]);
-    }
-    for (const finding of pair.report.findings)
-      rows.push([
-        'finding',
-        pair.key,
-        finding.accepted ? 'accepted' : 'open',
-        finding.id,
-        finding.code,
-        finding.severity,
-        finding.category,
-        finding.path,
-        finding.message,
-        JSON.stringify(finding.before),
-        JSON.stringify(finding.after),
-        finding.pointers.baseline,
-        finding.pointers.candidate,
-        finding.accepted?.reason ?? '',
-      ]);
-    for (const notice of pair.report.coverage)
-      rows.push([
-        'coverage',
-        pair.key,
-        'incomplete',
-        '',
-        notice.code,
-        '',
-        'coverage',
-        notice.pointer,
-        notice.message,
-        '',
-        '',
-        notice.side === 'baseline' ? notice.pointer : '',
-        notice.side === 'candidate' ? notice.pointer : '',
-        '',
-      ]);
+    for (const row of auditCsvRows(pair.report).slice(1))
+      rows.push([row[0], pair.key, ...row.slice(1)]);
   }
   return csvRows(rows);
 }

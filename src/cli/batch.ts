@@ -160,7 +160,13 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
   const definitions = parsePairs(await readTextFile(pairsPath, MAX_CONFIG_BYTES));
   const root = await realpath(dirname(resolve(pairsPath)));
   const generatedAt = options.generatedAt ?? new Date().toISOString();
-  const inputPaths = [resolve(pairsPath)];
+  const inputPaths = [
+    resolve(pairsPath),
+    ...definitions.flatMap((definition) => [
+      resolve(root, definition.baseline),
+      resolve(root, definition.candidate),
+    ]),
+  ];
   const pairs: BatchPairResult[] = [];
   const issues: BatchIssue[] = [];
   const baselinePaths = new Set<string>();
@@ -181,8 +187,19 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
   };
   for (const definition of definitions) {
     try {
-      const before = await rootedPath(root, definition.baseline);
-      const after = await rootedPath(root, definition.candidate);
+      // Resolve both independently: even if one is missing, the other selected
+      // file must remain protected from --output/--force and alias overwrites.
+      const resolved = await Promise.allSettled([
+        rootedPath(root, definition.baseline),
+        rootedPath(root, definition.candidate),
+      ]);
+      for (const input of resolved) if (input.status === 'fulfilled') inputPaths.push(input.value);
+      const beforeResult = resolved[0];
+      const afterResult = resolved[1];
+      if (beforeResult.status === 'rejected') throw beforeResult.reason;
+      if (afterResult.status === 'rejected') throw afterResult.reason;
+      const before = beforeResult.value;
+      const after = afterResult.value;
       if (baselinePaths.has(before) || candidatePaths.has(after))
         throw new CliError(
           'PAIR_FILE_DUPLICATE',
@@ -190,7 +207,6 @@ export async function runBatch(pairsPath: string, options: BatchOptions): Promis
         );
       baselinePaths.add(before);
       candidatePaths.add(after);
-      inputPaths.push(before, after);
       if (reportBudgetExhausted)
         throw new CliError(
           'BATCH_REPORT_LIMIT',

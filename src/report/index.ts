@@ -30,7 +30,7 @@ export function csvRows(rows: readonly (readonly unknown[])[]): string {
 }
 
 /** Evidence remains JSON-encoded inside cells, retaining types and multiplicity. */
-export function renderCsv(report: AuditReport): string {
+export function auditCsvRows(report: AuditReport): unknown[][] {
   const rows: unknown[][] = [
     [
       'record',
@@ -71,8 +71,8 @@ export function renderCsv(report: AuditReport): string {
       '',
       '',
       report.baseline.name,
-      report.baseline.id,
-      report.baseline.version,
+      JSON.stringify(report.baseline),
+      '',
       '',
       '',
       '',
@@ -86,8 +86,8 @@ export function renderCsv(report: AuditReport): string {
       '',
       '',
       report.candidate.name,
-      report.candidate.id,
-      report.candidate.version,
+      JSON.stringify(report.candidate),
+      '',
       '',
       '',
       '',
@@ -108,6 +108,60 @@ export function renderCsv(report: AuditReport): string {
       '',
     ],
   ];
+  const metadata = {
+    schemaVersion: report.schemaVersion,
+    toolVersion: report.toolVersion,
+    profileVersion: report.profileVersion,
+    fingerprintVersion: report.fingerprintVersion,
+    generatedAt: report.generatedAt,
+  };
+  for (const [key, value] of Object.entries(metadata))
+    rows.push([
+      'reproducibility',
+      '',
+      '',
+      key,
+      '',
+      '',
+      '',
+      value,
+      JSON.stringify(value),
+      '',
+      '',
+      '',
+      '',
+    ]);
+  rows.push([
+    'policy',
+    '',
+    '',
+    'ACTIVE_POLICY',
+    '',
+    '',
+    'policy',
+    'Effective URI rules and saved decisions',
+    JSON.stringify(report.policy),
+    '',
+    '',
+    '',
+    '',
+  ]);
+  for (const pair of report.canvasPairs)
+    rows.push([
+      'canvas_pair',
+      '',
+      pair.baselineId,
+      pair.matchedBy,
+      '',
+      'identity',
+      'canvasPairs',
+      pair.label,
+      JSON.stringify({ id: pair.baselineId, index: pair.baselineIndex }),
+      JSON.stringify({ id: pair.candidateId, index: pair.candidateIndex }),
+      '',
+      '',
+      '',
+    ]);
   for (const finding of report.findings) {
     rows.push([
       'finding',
@@ -142,7 +196,11 @@ export function renderCsv(report: AuditReport): string {
       '',
     ]);
   }
-  return csvRows(rows);
+  return rows;
+}
+
+export function renderCsv(report: AuditReport): string {
+  return csvRows(auditCsvRows(report));
 }
 
 const STATUS_LABELS: Record<AuditReport['status'], string> = {
